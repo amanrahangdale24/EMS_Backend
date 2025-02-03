@@ -69,18 +69,26 @@ module.exports = router;
 
 
 
-router.post('/acceptTask', async(req,res)=>{
+router.post('/acceptTask', async (req, res) => {
     try {
         const { taskId, employeeId } = req.body;
-        
-        // Find the task and update it
+
+        console.log("Received taskId:", taskId);
+        console.log("Received employeeId:", employeeId);
+
+        // Check if employeeId is defined
+        if (!employeeId) {
+            return res.status(400).json({ status: false, message: "Employee ID is required" });
+        }
+
+        // Find and update the task
         const updatedTask = await taskModel.findByIdAndUpdate(
             taskId,
             {   
                 active: true,
                 newTask: false,
             },
-            {new :true}
+            { new: true }
         );
 
         if (!updatedTask) {
@@ -89,18 +97,20 @@ router.post('/acceptTask', async(req,res)=>{
 
         // Increment the active task count in User model
         const updatedUser = await userModel.findByIdAndUpdate(
-            employeeId,
+            employeeId.trim(),  // 🔥 Ensure there are no leading/trailing spaces
             {
                 $inc: { 
-                    "taskNumbers.active": 1,  // ✅ Increment active tasks count
-                    "taskNumbers.newTask": -1 // ✅ Decrement new tasks count
+                    "taskNumbers.active": 1,  
+                    "taskNumbers.newTask": -1 
                 }
             },
-            { new: true } // ✅ Return the updated document
+            { new: true }
         );
 
+        console.log("Updated User:", updatedUser); // 🔥 Debugging log
+
         if (!updatedUser) {
-            return res.status(404).json({ status: false, message: "User not found" });
+            return res.status(404).json({ status: false, message: "User not found in database" });
         }
 
         res.status(200).json({
@@ -111,10 +121,10 @@ router.post('/acceptTask', async(req,res)=>{
         });
     } catch (error) {
         console.error("Error accepting task:", error);
-        res.status(500).json({ status: false, message: "Server error" });
+        res.status(500).json({ status: false, message: "Server error", error: error.message });
     }
+});
 
-})
 
 router.post("/markCompleted", async(req,res)=>{
     try {
