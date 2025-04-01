@@ -1,32 +1,43 @@
-const express = require("express"); 
-const cors = require("cors"); 
-const dotenv = require("dotenv"); 
+const express = require("express");
+const cors = require("cors");
+const dotenv = require("dotenv");
 const cookieParser = require("cookie-parser");
 
-dotenv.config(); 
+dotenv.config();
 
-const app = express(); 
+const app = express();
 
 // Import Routes
-const accountRoutes = require('./routes/account.route'); 
-const taskRoutes = require('./routes/tasks.route'); 
+const accountRoutes = require('./routes/account.route');
+const taskRoutes = require('./routes/tasks.route');
 const employeeRoutes = require('./routes/employee.route');
 
 // Database Connection
 const connectDB = require('./db/config/connection');
-connectDB(); 
+connectDB();
 
 // Middleware
-app.use(express.json()); 
-app.use(cookieParser()); 
+app.use(express.json());
+app.use(cookieParser());
+const allowedOrigins = [
+    'http://localhost:5173',
+    'https://scintillating-cascaron-3de3d5.netlify.app'
+];
+
 app.use(cors({
-    origin: 'http://localhost:5173', // Allow requests from this origin
-    credentials: true, // Enable credentials sharing (cookies, etc.)
+    origin: function (origin, callback) {
+        if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
+    credentials: true
 }));
 
 // Routes
-app.use('/user', accountRoutes); 
-app.use('/task', taskRoutes); 
+app.use('/user', accountRoutes);
+app.use('/task', taskRoutes);
 app.use('/emp', employeeRoutes);
 
 // Error Handling Middleware
