@@ -57,7 +57,8 @@ router.post('/register',
             });
         } catch (error) {
             res.status(403).json({
-                message: "error occured while sign up"
+                message: "error occured while sign up",
+                error:error.message
             })
         }
     }
