@@ -19,21 +19,18 @@ connectDB();
 // Middleware
 app.use(express.json());
 app.use(cookieParser());
-const allowedOrigins = [
-    'http://localhost:5173',
-    'https://scintillating-cascaron-3de3d5.netlify.app'
-];
-
 app.use(cors({
-    origin: function (origin, callback) {
-        if (!origin || allowedOrigins.includes(origin)) {
-            callback(null, true);
-        } else {
-            callback(new Error('Not allowed by CORS'));
-        }
+    origin: (origin, callback) => {
+      if (!origin) return callback(null, true);
+      if (origin.includes('.netlify.app') || origin.includes('.vercel.app')) {
+        return callback(null, true);
+      }
+      callback(new Error('Not allowed by CORS'));
     },
-    credentials: true
-}));
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Allow all necessary methods
+    allowedHeaders: ['Content-Type', 'Authorization'] // Allow necessary headers
+  }));
 
 // Routes
 app.use('/user', accountRoutes);
