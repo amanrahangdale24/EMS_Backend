@@ -24,7 +24,7 @@ app.use(cookieParser());
 const allowedOrigins = [
     'http://localhost:5173',   // React development
     'http://127.0.0.1:5173',   // Some browsers use 127.0.0.1
-    'https://peaceful-pie-5cf979.netlify.app/',  // Replace with actual Netlify domain
+    'https://gregarious-lily-cce3e3.netlify.app/',  // Replace with actual Netlify domain
     // 'https://your-site.vercel.app'   // Replace with actual Vercel domain
 ];
 
