@@ -19,18 +19,26 @@ connectDB();
 // Middleware
 app.use(express.json());
 app.use(cookieParser());
+
+
+const allowedOrigins = [
+    'http://localhost:5173',   // React development
+    'http://127.0.0.1:5173',   // Some browsers use 127.0.0.1
+    'https://peaceful-pie-5cf979.netlify.app/',  // Replace with actual Netlify domain
+    // 'https://your-site.vercel.app'   // Replace with actual Vercel domain
+];
+
 app.use(cors({
     origin: (origin, callback) => {
-      if (!origin) return callback(null, true);
-      if (origin.includes('.netlify.app') || origin.includes('.vercel.app')) {
-        return callback(null, true);
-      }
-      callback(new Error('Not allowed by CORS'));
+        if (!origin || allowedOrigins.some(allowed => origin.includes(allowed))) {
+            return callback(null, true);
+        }
+        return callback(new Error('Not allowed by CORS'));
     },
     credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Allow all necessary methods
-    allowedHeaders: ['Content-Type', 'Authorization'] // Allow necessary headers
-  }));
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], 
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));
 
 // Routes
 app.use('/user', accountRoutes);
